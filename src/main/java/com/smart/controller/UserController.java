@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -41,7 +42,7 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private ContactRepository contactRepository;
 
@@ -92,14 +93,21 @@ public class UserController {
 
 			}
 
-			// file to folder and update the name of contact
-			contact.setImage(file.getOriginalFilename());
+			if (file.isEmpty()) {
+				System.out.println("File is Empty");
+				contact.setImage("contact.png");
+			} else {
 
-			File saveFile = new ClassPathResource("static/img").getFile();
-			Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
-			Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+				// file to folder and update the name of contact
+				contact.setImage(file.getOriginalFilename());
 
-			System.out.println("Image Uploaded");
+				File saveFile = new ClassPathResource("static/img").getFile();
+				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
+				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+				System.out.println("Image Uploaded");
+
+			}
 
 			contact.setUser(user);// user ko contact do OR contact ko user
 			user.getContacts().add(contact);
@@ -122,29 +130,139 @@ public class UserController {
 		return "normal/add_contact";
 
 	}
-	
-	
-	
-	//View contacts Handler
+
+	// View contacts Handler
 	@GetMapping("/view-contact/{page}")
-	public String viewContactHandler(@PathVariable("page") Integer page,Model model, Principal principal) {
+	public String viewContactHandler(@PathVariable("page") Integer page, Model model, Principal principal) {
 		System.out.println("Inside View-Contact handler");
 		model.addAttribute("title", "View-Contact");
-		
-		
+
 		String userName = principal.getName();
 		User user = userRepository.getUserByUserName(userName);
-		
-		//currentPage=page
-		//Contact per page= 4
+
+		// currentPage=page
+		// Contact per page= 4
 		Pageable pageable = PageRequest.of(page, 4);
-		
-		Page<Contact> contacts = this.contactRepository.findContactByUser(user.getId(),pageable);
+
+		Page<Contact> contacts = this.contactRepository.findContactByUser(user.getId(), pageable);
 		model.addAttribute("contacts", contacts);
 		model.addAttribute("currentPage", page);
-		model.addAttribute("totalPage",contacts.getTotalPages());
+		model.addAttribute("totalPage", contacts.getTotalPages());
 
 		return "normal/view_contact";
 	}
 
+	// Showing individual contact in Detail
+
+	@GetMapping("/{cId}/contact")
+	public String showContactDetails(@PathVariable("cId") Integer cId, Model model, Principal principal) {
+		System.out.println("Inside Indivdial contcat handler");
+
+		Optional<Contact> contactOptinal = this.contactRepository.findById(cId);
+		Contact contact = contactOptinal.get();
+
+		// user can see own contacts
+		String userName = principal.getName();
+		User user = userRepository.getUserByUserName(userName);
+
+		if (user.getId() == contact.getUser().getId()) {
+			model.addAttribute("contact", contact);
+			model.addAttribute("title", "Contact-InDeatails");
+
+		}
+
+		return "normal/contact_InDetail";
+	}
+//DElete handler
+	@GetMapping("/delete/{cId}")
+	public String deleteString(@PathVariable("cId") Integer cId, Model model, HttpSession session,Principal principal) {
+		System.out.println("Inside Delete Contact handler");
+
+		Contact contact = this.contactRepository.findById(cId).get();
+
+		// unlinking from user
+		User user=this.userRepository.getUserByUserName(principal.getName());
+		user.getContacts().remove(contact);
+		this.userRepository.save(user);
+		
+		
+		
+		System.out.println("DELETED");
+
+		session.setAttribute("message", new Message(" Contact Deleted Successfully !!", "alert-success"));
+
+		return "redirect:/user/view-contact/0";
+	}
+
+	@PostMapping("/update-contact/{cId}")
+	public String updateContacthandler(@PathVariable("cId") Integer cId, Model model, HttpSession session) {
+		System.out.println("Inside Upadate-Contact Contact handler");
+
+		Contact contact = this.contactRepository.findById(cId).get();
+		model.addAttribute("contact", contact);
+
+		return "normal/update-contact";
+	}
+	
+	//updating and saving
+	@PostMapping("/update-contact")
+	public String updateContactHandler(@Valid @ModelAttribute Contact contact,BindingResult result,
+			@RequestParam("profileImage") MultipartFile file, Principal principal, HttpSession session, Model m) {
+
+		
+		try {
+			
+			
+			//old contact details
+			Contact oldContactDetails=this.contactRepository.findById(contact.getCid()).get();
+			
+			//image
+			if(!file.isEmpty()) {
+				//file work
+				//rewrite
+				//delete old photo and
+				File deleteFile = new ClassPathResource("static/img").getFile();
+				File file1 = new File(deleteFile, oldContactDetails.getImage());
+				file1.delete();
+				
+				
+				
+				//upadte new one
+				File saveFile = new ClassPathResource("static/img").getFile();
+				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
+				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+				
+				contact.setImage(file.getOriginalFilename());
+				
+			}
+			else {
+				contact.setImage(oldContactDetails.getImage());
+			}
+			
+			
+			
+			User user=this.userRepository.getUserByUserName(principal.getName());
+			contact.setUser(user);
+			this.contactRepository.save(contact);
+			// succes message
+			session.setAttribute("message", new Message(" Your Contact is Updated !!", "alert-success"));
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();		
+			}
+	
+		System.out.println("UPDATED CONTACT NAME :"+contact.getName());
+		System.out.println("CONTACT ID :"+contact.getCid());
+		
+		return "redirect:/user/"+contact.getCid()+"/contact";
+
+	}
+	
+	//User profile handler
+	@GetMapping("/profile")
+	public String yourProfileHandler( Model model) {
+		model.addAttribute("title", "Add-Contact");
+		return "normal/your_profile";
+	}
 }

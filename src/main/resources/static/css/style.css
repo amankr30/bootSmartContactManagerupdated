@@ -106,3 +106,27 @@ body {
 	color: cadetblue;
 	font-size: 25px;
 }
+
+.profile_photo{
+	width: 35px;
+	height: 35px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+/*Search CSS*/
+.search-container{
+	position: relative;
+}
+.search-result{
+	position: absolute;
+	background: white;
+	width: 100%;
+	padding: 10px;
+	border: 1px solid grey;
+	display: none;
+}
+.active{
+	background: #009688 !important;
+	color: white !important;
+}
