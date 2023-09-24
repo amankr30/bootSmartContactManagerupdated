@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="normal/base::Layout(~{::section})">
+
+<head>
+	<meta charset="UTF-8" />
+	<title th:text="${title}">Update_Contact</title>
+</head>
+
+<body>
+	<section>
+		<div class="card ms-3 me-2">
+			<div class="card-body">
+				<h1 class="text-center">Update Contacts</h1>
+				<div class="container-fluid mt-1">
+					<div class="row">
+						<div class="col-md-10 offset-md-1">
+							<form novalidate="novalidate" action="#" th:object="${contact}"
+								enctype="multipart/form-data" method="post" th:action="@{/user/update-contact}"
+								class="mt-2">
+								
+								<input th:value="${contact.Cid}" type="hidden" name="Cid" />
+								<!-- First Name -->
+								<div class="mb-3">
+									<div class="input-group">
+										<span class="input-group-text"><i class="fa fa-plus"></i></span>
+										<input required type="text" class="form-control" id="firstname"
+											placeholder="Enter Name here" name="name" th:value="${contact.name}"
+											th:classappend="${#fields.hasErrors('name')?'is-invalid':''}">
+
+										<div th:each="e:${#fields.errors('name')}" th:text="${e}"
+											id="validationServer03Feedback" class="invalid-feedback"></div>
+									</div>
+								</div>
+
+								<!--Scond-Name-->
+								<div class="mb-3">
+									<div class="input-group">
+										<span class="input-group-text"><i class="fa fa-user"></i></span>
+										<input type="text" th:value="${contact.secondName}" class="form-control"
+											id="secondName" placeholder="Enter Nick Name here" name="secondName">
+									</div>
+								</div>
+								<!--Phone-->
+								<div class="mb-3">
+									<div class="input-group">
+										<span class="input-group-text"><i class="fa fa-phone"></i></span>
+										<input type="number" class="form-control" id="phoneNumber"
+											placeholder="Enter Phone Number" name="phone" required
+											th:value="${contact.phone}"
+											th:classappend="${#fields.hasErrors('phone')?'is-invalid':''}">
+
+										<div th:each="e : ${#fields.errors('phone')}" th:text="${e}"
+											id="validationServer03Feedback" class="invalid-feedback"></div>
+									</div>
+								</div>
+								<!--Email-->
+								<div class="mb-3">
+									<div class="input-group">
+										<span class="input-group-text">@</span>
+										<input type="email" class="form-control" id="Email" required
+											placeholder="Enter Email" name="email" th:value="${contact.email}"
+											th:classappend="${#fields.hasErrors('phone')?'is-invalid':''}">
+
+										<div th:each="e : ${#fields.errors('email')}" th:text="${e}"
+											id="validationServer03Feedback" class="invalid-feedback"></div>
+									</div>
+								</div>
+								<!--Work-->
+								<div class="mb-3">
+									<div class="input-group">
+										<span class="input-group-text"><i class="fa fa-briefcase"></i></span>
+										<input type="text" th:value="${contact.work}" class="form-control" id="Work"
+											placeholder="Enter Work here" name="work">
+									</div>
+								</div>
+
+								<!--Description-->
+
+								<div class="form-group mb-3">
+
+									<textarea class="form-control" th:text="${contact.description}" name="description"
+										id="description" cols="30" rows="6"
+										placeholder="Enter Contact Description"></textarea>
+								</div>
+
+
+								<!--Shwong earlier Image-->
+								<div class="container text-center">
+									<img style="height: 200px; width: 200px; border-radius: 50%;" class="img-fluid"
+										th:src="@{'/img/'+${contact.image}}" alt="No-Profile" />
+								</div>
+
+								<p class="text-secondary">Choose new Profile Pic</p>
+
+								<!--Custom-file-->
+								<div class="custom-file">
+									<input type="file" name="profileImage" />
+								</div>
+
+								<div class="container text-center">
+									<button class="btn btn-outline-info">UPDATE</button>
+								</div>
+
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+	</section>
+</body>
+
+</html>
