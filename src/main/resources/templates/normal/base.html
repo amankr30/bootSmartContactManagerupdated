@@ -25,10 +25,10 @@
 <body>
 
 
-	<nav class="fixed-top navbar navbar-expand-lg navbar-dark bg-primary">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
 		<div class="container-fluid">
 
-			<a class="navbar-brand" href="#">Contact-Manager</a>
+			<a style="font-style: italic; font-weight: 600" class="navbar-brand" href="#">Contact-Manager App</a>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
 				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
 				aria-label="Toggle navigation">
@@ -40,18 +40,18 @@
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0 text-uppercase">
 
 					<li class="nav-item">
-						<a class="nav-link " aria-current="page" th:href="@{/}">Home</a>
+						<a style="font-style: italic;" class="nav-link " aria-current="page" th:href="@{/}">Home</a>
 					</li>
 
 
 
 					<li class="nav-item">
-						<a class="nav-link " href="#" tabindex="-1" aria-disabled="true"><span
+						<a style="font-style: italic;" class="nav-link " href="#" tabindex="-1" aria-disabled="true"><span
 								th:text="${user.name}"></span></a>
 					</li>
 
 					<li class="nav-item">
-						<a class="nav-link " aria-current="page" th:href="@{/logout}">Logout</a>
+						<a style="font-style: italic;" class="nav-link " aria-current="page" th:href="@{/logout}">Logout</a>
 					</li>
 
 
@@ -65,7 +65,7 @@
 
 
 	<!--SIDE-BAR-->
-	<div class="sidebar mt-2">
+	<div class="sidebar ">
 		<spna onclick="toggleSidebar()" class="croosBtn">&times;</spna>
 
 		
@@ -74,7 +74,7 @@
 		<a href="#" id="contact-link" th:href="@{/user/view-contact/0}" class="item"><i class="fa-solid fa-address-card"></i></i> View Contact</a>
 		<a href="#" id="add-link" th:href="@{/user/add-contact}" class="item"><i class="fa-solid fa-plus"></i> Add Contact</a>
 		<a href="#" id="profile-link" th:href="@{/user/profile}" class="item"><i class="fa-solid fa-user-circle"></i> Your Profile</a>
-		<a href="#" id="setting-link" class="item"><i class="fa-solid fa-gear"></i> Settings</a>
+		<a href="#" id="setting-link" th:href="@{/user/setting}" class="item"><i class="fa-solid fa-gear"></i> Settings</a>
 		<a href="#" th:href="@{/logout}" class="item"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
 		<div class="divider"></div>
 
@@ -83,13 +83,13 @@
 
 	<!--CONTENT-AREA-->
 
-	<div class="content mt-5">
+	<div class="content ">
 		<i onclick="toggleSidebar()" class="fa fa-bars m-3 barr"></i>
 		
 		
 		<!--Errro OR succes message Box-->
-		<div th:if="${session.message}" th:classappend="${session.message.type}" class="alert " role="alert">
-			<p class="text-center" th:text="${session.message.content}"></p>
+		<div th:if="${session.message}" th:classappend="${session.message.type}" class="alert ms-3 me-3 col-md-10 offset-md-1" role="alert">
+			<p class="text-center " th:text="${session.message.content}"></p>
 			<th:block th:text="${@sessionHelper.removeMessageFromSession()}"></th:block>
 		</div>
 

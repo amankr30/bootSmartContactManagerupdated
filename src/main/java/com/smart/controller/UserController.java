@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,6 +43,9 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@Autowired
 	private ContactRepository contactRepository;
@@ -262,7 +266,44 @@ public class UserController {
 	//User profile handler
 	@GetMapping("/profile")
 	public String yourProfileHandler( Model model) {
-		model.addAttribute("title", "Add-Contact");
+		model.addAttribute("title", "Your-Profile");
 		return "normal/your_profile";
 	}
+	
+	//User Settings handler
+		@GetMapping("/setting")
+		public String settingHandler(Model model) {
+			model.addAttribute("title", "Your-Setting");
+			return "normal/setting";
+		}
+		
+//change password handler
+		@PostMapping("/change-password")
+		public String changePasswordHandler(@RequestParam("oldPassword") String oldPassword,@RequestParam("newPassword") String newPassword ,HttpSession session,Principal principal) {
+		System.out.println(" Inside Old-password Handler");
+		System.out.println("Old-password:  "+oldPassword);
+		System.out.println("New-password: "+newPassword);
+		
+		String userName = principal.getName();
+		User currentUser = this.userRepository.getUserByUserName(userName);
+		System.out.println(currentUser.getPassword());
+		
+		if(this.passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
+			
+			//change password
+			currentUser.setPassword(this.passwordEncoder.encode(newPassword));
+			this.userRepository.save(currentUser);
+			session.setAttribute("message", new Message(" Password Changed !!", "alert-success"));
+			
+			
+		}
+		else {
+			session.setAttribute("message", new Message("Enter Correct Password !!", "alert-danger"));
+			return "redirect:/user/setting"; 
+		}
+		
+		
+		return "redirect:/user/index";
+			
+		}
 }
